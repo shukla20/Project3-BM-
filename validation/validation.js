@@ -16,4 +16,10 @@ function regForDate(input){
     let re = /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
     return re.test(input)
 }
-module.exports= {valid, regForName,regForDate} 
+const isValidISBN = function(ISBN){
+    let re= /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/
+    
+      return re.test(ISBN)
+    
+  }
+module.exports= {valid, regForName,regForDate,isValidISBN} 

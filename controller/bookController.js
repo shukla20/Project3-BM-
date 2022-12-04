@@ -1,11 +1,12 @@
 const mongoose= require('mongoose')
 const bookModel = require("../models/bookmodel")
 const reviewModel= require("../models/reviewmodel")
+const lodash= require("lodash")
 
 
 
 
-const {valid, regForName, regForDate} = require("../validation/validation")
+const {valid, regForName, regForDate,isValidISBN} = require("../validation/validation")
 
 const createBook = async function(req, res){
     try{
@@ -25,7 +26,7 @@ const createBook = async function(req, res){
         if(valid(excerpt)==false) return res.status(400).send({status:false, message:"Invalid excerpt"})
         if(valid(ISBN)==false) return res.status(400).send({status:false, message:"Invalid ISBN"})
         if(valid(category)==false) return res.status(400).send({status:false, message:"Invalid category"})
-        if(valid(subcategory)==false) return res.status(400).send({status:false, message:"Invalid subcategory"})
+        
         let validObjId = mongoose.Types.ObjectId.isValid(userId)
         if(validObjId==false) return res.status(400).send({status:false, message:"Invalid ObjectId"})
 
@@ -35,7 +36,7 @@ const createBook = async function(req, res){
         let present = await bookModel.findOne({title:title})
         if(present) return res.status(400).send({status:false, message:"This title is already present in the DB"})
         if(regForName(excerpt)==false) return res.status(400).send({status:false, message:"Invalid excerpt"})
-        if(regForName(ISBN)==false) return res.status(400).send({status:false, message:"Invalid ISBN"})
+        if(isValidISBN(ISBN)==false) return res.status(400).send({status:false, message:"Invalid ISBN"})
         let present1 = await bookModel.findOne({ISBN:ISBN})
         if(present1) return res.status(400).send({status:false, message:"This ISBN is already present in the DB"})
         if(regForName(category)==false) return res.status(400).send({status:false, message:"Invalid category"})
@@ -59,12 +60,12 @@ const getBookDetails = async function (req, res) {
       }).select({ ISBN: 0, isDeleted: 0, deletedAt: 0, createdAt: 0, updatedAt: 0, __v: 0 }).collation({ locale: "en" }).sort({ title: 1 });
 
       if (bookData.length == 0) return res.status(404).send({ status: false, message: "no document found" })
-
-      res.status(200).send({ status: true, message: "Book List", data: bookData })
+      let sorted = lodash.sortBy(bookData,["title"])
+      return res.status(200).send({status:true, message: "book list", data:sorted})
 
   } catch (err) {
-      return res.status(500).send({ status: false, message: err.message })
-    }
+      return res.status(500).send({ status: false, message: err.message})
+}
 }
 
 

@@ -17,6 +17,11 @@ mongoose.connect("mongodb+srv://Shukla123:Shukla123@cluster0.vyd2nui.mongodb.net
 
 
 app.use('/', route);
+app.use("/*",function(req,res){
+
+    res.status(400).send({status:false ,message:"Wrong path! "})
+}
+)
 
 
 app.listen(process.env.PORT || 3000, function () {

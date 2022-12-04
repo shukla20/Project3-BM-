@@ -4,7 +4,10 @@ const reviewModel = require("../models/reviewmodel");
 const userModel= require("../models/usermodel")
 const jwt = require("jsonwebtoken")
 const { valid, regForName, regForDate } = require('../validation/validation');
-
+function validateEmail(input) {
+  var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(input);
+}
 const createUser = async function (req, res) {
     try {
       let user = req.body
@@ -43,10 +46,7 @@ const createUser = async function (req, res) {
       if (valid(email) === false) {
         return res.status(400).send({ status: false, msg: "Email is not valid" })
       }
-      function validateEmail(input) {
-        var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(input);
-      }
+      
       if (validateEmail(email) == false) { return res.status(400).send({ status: false, msg: "email format is invalid" }) }
   
       let uniqueEmail = await userModel.findOne({ email: email })
@@ -61,24 +61,42 @@ const createUser = async function (req, res) {
       if (!(password.length > 8) || (!(password.length < 15))) {
         return res.status(400).send({ status: false, msg: "Password must be between 8 to 15 Characters" })
       }
-      else {
+      if(address){
+        if(typeof address!= "object"){
+          return res.status(400).send({status:false, message:"Address should be in object!"})
+        }
+        else {
+          let userCreated = await userModel.create(user);
+          return res.status(201).send({ status: true, data: userCreated })
+        }
+        
+      }else {
         let userCreated = await userModel.create(user);
         return res.status(201).send({ status: true, data: userCreated })
       }
+      
+      
     }
     catch (err) {
       return res.status(500).send({ status: false, msg: err.message })
-    }
+  }
   }
   
 
 const loginUser = async function (req, res) {
     try {
       let emailId = req.body.email;
-      let password = req.body.password;
-      if (!(emailId && password)) {
-        return res.status(400).send({ status: false, msg: "Email Id and Password both are mandatory for login" })
+      if (!(emailId)) {
+        return res.status(400).send({ status: false, msg: "Email Id  is mandatory for login" })
       }
+      if(validateEmail(emailId)==false){
+        return res.status(400).send({status:false, message:"Invalid email Format"})
+      }
+      let password = req.body.password;
+      if (!(password)) {
+        return res.status(400).send({ status: false, msg: " Password is mandatory for login" })
+      }
+      
   
       let user = await userModel.findOne({ email: emailId, password: password });
       if (!user) { return res.status(404).send({ status: false, msg: "User not found with this EmailId and Password", }) }
@@ -90,7 +108,7 @@ const loginUser = async function (req, res) {
           password: password
   
         },
-        "room-35-secret-key"
+        "room-35-secret-key",{expiresIn:"1hr"}
       );
       res.setHeader("x-api-key", token);
       return res.status(200).send({ status: true, data: token });
