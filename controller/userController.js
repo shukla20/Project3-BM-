@@ -8,6 +8,29 @@ function validateEmail(input) {
   var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(input);
 }
+
+function validmobile(input){
+  var mobile=input;
+  if(mobile.length!=10){
+      return false;
+      
+  }
+  intRegex = /[0-9 -()+]+$/;
+  var is_mobile=true;
+  for ( var i=0; i < 10; i++) {
+      if(intRegex.test(mobile[i]))
+      { 
+          continue;
+      }
+      else{
+          is_mobile=false;
+          break;
+      }
+  }
+  return is_mobile;
+}
+
+
 const createUser = async function (req, res) {
     try {
       let user = req.body
@@ -38,9 +61,8 @@ const createUser = async function (req, res) {
       if (valid(phone) === false) {
         return res.status(400).send({ status: false, msg: "Phone is not valid" })
       }
-      if (phone.length != 10) { return res.status(400).send({ status: false, msg: "Phone No. must be 10 characters" }) }
-      let uniquePhone = await userModel.find({ phone: phone })
-      if (uniquePhone[0]) { return res.status(400).send({ status: false, msg: "Phone number Already exists" }) }
+      if(validmobile(phone)===false){
+        return res.status(400).send({ status: false, msg: "Phone is not valid" })}
   
       if (!email) { return res.status(400).send({ status: false, msg: "Email Id is mandatory" }) }
       if (valid(email) === false) {
