@@ -63,6 +63,9 @@ const createUser = async function (req, res) {
       }
       if(validmobile(phone)===false){
         return res.status(400).send({ status: false, msg: "Phone is not valid" })}
+
+        let uniquePhone = await userModel.findOne({ phone: phone })
+      if (uniquePhone) { return res.status(404).send({ status: false, msg: "Phone No. Already exists" }) }
   
       if (!email) { return res.status(400).send({ status: false, msg: "Email Id is mandatory" }) }
       if (valid(email) === false) {

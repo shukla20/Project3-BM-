@@ -1,5 +1,6 @@
 const mongoose= require('mongoose')
 const bookModel = require("../models/bookmodel")
+const userModel = require("../models/usermodel")
 const reviewModel= require("../models/reviewmodel")
 const lodash= require("lodash")
 
@@ -36,6 +37,8 @@ const createBook = async function(req, res){
         let present = await bookModel.findOne({title:title})
         if(present) return res.status(400).send({status:false, message:"This title is already present in the DB"})
         if(regForName(excerpt)==false) return res.status(400).send({status:false, message:"Invalid excerpt"})
+        let user = await userModel.findOne({_id: userId})
+        if(!user) return res.status(400).send({status:false, message:"This User is not Present"})
         if(isValidISBN(ISBN)==false) return res.status(400).send({status:false, message:"Invalid ISBN"})
         let present1 = await bookModel.findOne({ISBN:ISBN})
         if(present1) return res.status(400).send({status:false, message:"This ISBN is already present in the DB"})

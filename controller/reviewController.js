@@ -96,25 +96,27 @@ const deleteReview = async function (req, res) {
         }
         let book = await bookModel.findOne({ _id: bookID, isDeleted: false })
         if (!book) {
-            return res.status(404).send({ status: false, message: "ReviewId is not found!" })
+            return res.status(404).send({ status: false, message: "BOOK is not found!" }) //BOOK NOT FOUND
         }
  
         if (mongoose.Types.ObjectId.isValid(reviewId)==false) {
             return res.status(400).send({ status: false, mesage: "ReviewId is not valid!" })
 
         }
-        let review = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
+        let review = await reviewModel.findOne({ _id: reviewId }).lean()
+        console.log(review)
+
         if (!review) {
             return res.status(404).send({ status: false, message: "review is not found!" })
         }
         if (review.bookId!= bookID) {
             return res.status(404).send({ status: false, message: "Review not found!" })
         }
-
         if (review.isDeleted === true) {
             return res.status(400).send({ status: false, message: "This review is already deleted!" })
         }
-
+        
+        
         let reviewDelete = await reviewModel.findOneAndUpdate(
             { _id: reviewId },
             { $set: { isDeleted: true } })
@@ -122,7 +124,7 @@ const deleteReview = async function (req, res) {
         let updateBook = await bookModel.findOneAndUpdate(
             { _id: bookID },
             { $inc: { reviews: -1 } })
-        res.status(200).send({ status: true, message: "Review document is deleted successfully!" })
+        res.status(200).send({ status: true, message: "Review document is deleted successfully!",data:review })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message})

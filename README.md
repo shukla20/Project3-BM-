@@ -51,7 +51,7 @@
   reviewedBy: {string, mandatory, default 'Guest', value: reviewer's name},
   reviewedAt: {Date, mandatory},
   rating: {number, min 1, max 5, mandatory},
-  review: {string, optional}
+  review: {string, optional},
   isDeleted: {boolean, default: false},
 }
 ```
@@ -72,7 +72,7 @@
 ### POST /books
 - Create a book document from request body. Get userId in request body only.
 - Make sure the userId is a valid userId by checking the user exist in the users collection.
-- Return HTTP status 201 on a succesful book creation. Also return the book document. The response should be a JSON object like [this](#successful-response-structure) 
+- Return HTTP status 201 on a succesful book creation. Also return the book document. The response should be a JSON object like [this](#successful-response-structure)  
 - Create atleast 10 books for each user
 - Return HTTP status 400 for an invalid request with a response body like [this](#error-response-structure)
 

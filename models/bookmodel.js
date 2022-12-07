@@ -44,8 +44,9 @@ const bookSchema = new mongoose.Schema({
     },
     releasedAt:  {
         type:Date, 
-        required:true, 
+        required:true,
+        default: Date 
        },
   },{timestamps:true}
- ) 
+ )  
 module.exports = mongoose.model("book",bookSchema)
